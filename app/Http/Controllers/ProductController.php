@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Section;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProductStoreRequest;
+use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
@@ -61,7 +62,7 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(UpdateProductRequest $request)
     {
       $product = Product::findOrFail($request->id);
       $product->update([
