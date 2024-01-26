@@ -75,8 +75,7 @@ class SectionController extends Controller
     public function destroy(Request $request)
     {
         Section::findOrFail($request->id)->delete();
-        session()->flash('delete','تم حذف القسم بنجاح');
-        return redirect()->back();
+        return redirect()->back()->with(['delete' => 'تم حذف القسم بنجاح']);
 
     }
 }

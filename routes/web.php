@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SectionController;
 
 /*
@@ -26,6 +27,7 @@ Auth::routes(['register' => false]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('/invoices', InvoiceController::class)->middleware('auth');
 Route::resource('/sections', SectionController::class)->middleware('auth');
+Route::resource('/products', ProductController::class)->middleware('auth');
 //this should be the last route if you but any route after it, it will not work
 Route::get('/{page}', [AdminController::class,'index']);
 
