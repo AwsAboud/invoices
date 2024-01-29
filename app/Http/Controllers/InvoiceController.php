@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\Product;
+use App\Models\Section;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
@@ -20,7 +23,10 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        //
+
+        return view('invoices.create',[
+            'sections' => Section::all()
+        ]);
     }
 
     /**
@@ -62,4 +68,14 @@ class InvoiceController extends Controller
     {
         //
     }
+
+     /**
+     * get product that associated with the given section_id to use it in invoices/create view .
+     */
+    public function getProducts($id)
+    {
+       $products = Product::where('section_id', $id)->pluck('product_name', 'id');
+       return json_encode($products);
+    }
+
 }

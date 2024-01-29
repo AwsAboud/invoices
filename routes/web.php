@@ -28,6 +28,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::resource('/invoices', InvoiceController::class)->middleware('auth');
 Route::resource('/sections', SectionController::class)->middleware('auth');
 Route::resource('/products', ProductController::class)->middleware('auth');
+Route::get('/section/{id}',[InvoiceController::class,'getProducts'] );
 //this should be the last route if you but any route after it, it will not work
 Route::get('/{page}', [AdminController::class,'index']);
 
