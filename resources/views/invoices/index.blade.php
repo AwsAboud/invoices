@@ -29,59 +29,71 @@
         <!--div-->
         <div class="col-xl-12">
             <div class="card">
-                 <!-- add invoice button -->
-                 <div class="row row-sm mt-3 mr-2 ">
+                <!-- add invoice button -->
+                <div class="row row-sm mt-3 mr-2 ">
                     <div class="col-sm-6 col-md-4 col-xl-3 ">
                         <a class="modal-effect btn btn-outline-primary btn-block text-lg"
-                             href="{{route('invoices.create')}}">اضافة&nbsp; فاتورة </a>
+                            href="{{ route('invoices.create') }}">اضافة&nbsp; فاتورة </a>
                     </div>
-                 </div>
+                </div>
                 <!-- End add invoice button -->
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table text-md-nowrap" id="example1">
-                                <thead>
-                                    <tr>
-                                        <th class="wd-15p border-bottom-0">#</th>
-                                        <th class="wd-15p border-bottom-0">رقم الفاتورة</th>
-                                        <th class="wd-20p border-bottom-0">ناريخ الفانورة</th>
-                                        <th class="wd-15p border-bottom-0">تاريخ الاستحقاق</th>
-                                        <th class="wd-10p border-bottom-0">المنتج</th>
-                                        <th class="wd-25p border-bottom-0">القسم</th>
-                                        <th class="wd-10p border-bottom-0">الخصم</th>
-                                        <th class="wd-25p border-bottom-0">نسبة الضريبة</th>
-                                        <th class="wd-10p border-bottom-0">قيمة الضريبة</th>
-                                        <th class="wd-25p border-bottom-0">الاجمالي</th>
-                                        <th class="wd-10p border-bottom-0">الحالة</th>
-                                        <th class="wd-25p border-bottom-0">الملاحظات</th>
-                                    </tr>
-                                </thead>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table text-md-nowrap" id="example1">
+                            <thead>
+                                <tr>
+                                    <th class="wd-15p border-bottom-0">#</th>
+                                    <th class="wd-15p border-bottom-0">رقم الفاتورة</th>
+                                    <th class="wd-20p border-bottom-0">ناريخ الفانورة</th>
+                                    <th class="wd-15p border-bottom-0">تاريخ الاستحقاق</th>
+                                    <th class="wd-10p border-bottom-0">المنتج</th>
+                                    <th class="wd-25p border-bottom-0">القسم</th>
+                                    <th class="wd-10p border-bottom-0">الخصم</th>
+                                    <th class="wd-25p border-bottom-0">نسبة الضريبة</th>
+                                    <th class="wd-10p border-bottom-0">قيمة الضريبة</th>
+                                    <th class="wd-25p border-bottom-0">الاجمالي</th>
+                                    <th class="wd-10p border-bottom-0">الحالة</th>
+                                    <th class="wd-25p border-bottom-0">الملاحظات</th>
+                                    <th class="wd-25p border-bottom-0">العمليات</th>
+                                </tr>
+                            </thead>
+                            @foreach ($invoices as $invoice)
                                 <tbody>
                                     <tr>
-                                        <td>Bella</td>
-                                        <td>Chloe</td>
-                                        <td>System Developer</td>
-                                        <td>2018/03/12</td>
-                                        <td>$654,765</td>
-                                        <td>b.Chloe@datatables.net</td>
-                                        <td>Chloe</td>
-                                        <td>System Developer</td>
-                                        <td>2018/03/12</td>
-                                        <td>$654,765</td>
-                                        <td>b.Chloe@datatables.net</td>
-                                        <td>$654,765</td>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>{{$invoice->invoice_number}}</td>
+                                        <td>{{$invoice->invoice_date}}</td>
+                                        <td>{{$invoice->due_date}}</td>
+                                        <td>{{$invoice->product}}</td>
+                                        <td><a href="{{url('invoice/details/' . $invoice->id)}}">{{$invoice->section->section_name}}</a></td>
+                                        <td>{{$invoice->discount }}</td>
+                                        <td>{{$invoice->rate_vat}}</td>
+                                        <td>{{$invoice->value_vat}}</td>
+                                        <td>{{$invoice->total}}</td>
+                                        <td>
+                                            @if($invoice->value_status == 1)
+                                                <span class="text-success">{{$invoice->status}}</span>
+                                            @elseif($invoice->value_status == 2)
+                                                <span class="text-danger">{{$invoice->status}}</span>
+                                            @else
+                                                <span class="text-warning">{{$invoice->status}}</span>
+                                            @endif
+                                        </td>
+                                        <td>{{$invoice->note}}</td>
+                                        <td>{{$invoice->product}}</td>
                                     </tr>
                                 </tbody>
-                            </table>
-                        </div>
+                            @endforeach
+                        </table>
                     </div>
                 </div>
             </div>
-            <!--/div-->
-
-            <!--div-->
         </div>
-        <!-- row closed -->
+        <!--/div-->
+
+        <!--div-->
+    </div>
+    <!-- row closed -->
     </div>
     <!-- Container closed -->
     </div>
