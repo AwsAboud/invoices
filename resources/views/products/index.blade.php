@@ -24,47 +24,57 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
-       <!-- validation error messages -->
-       @if ($errors->any())
-       <div class="alert alert-danger">
-           <ul>
-               @foreach ($errors->all() as $error)
-                   <li>{{ $error }}</li>
-               @endforeach
-           </ul>
-       </div>
-   @endif
-   <!-- End validation error messages -->
-   <!-- Section Added Successfully message -->
-   @if(session()->has('add'))
-       <div class="alert alert-success alert-dismissible fade show" role="alert">
-           <strong>{{ session()->get('add') }}</strong>
-           <button type="button" class="close  fixed-top-right" data-dismiss="alert" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-           </button>
-       </div>
-   @endif
-   <!-- End Section Added Successfully message-->
-   <!-- Section updated Successfully message -->
-    @if(session()->has('update'))
-       <div class="alert alert-success alert-dismissible fade show" role="alert">
-           <strong>{{ session()->get('update') }}</strong>
-           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-           </button>
-       </div>
+    <!-- validation error messages -->
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
-   <!-- End Section Updated Successfully message-->
-   <!-- Section delete Successfully message -->
-   @if(session()->has('delete'))
-       <div class="alert alert-success alert-dismissible fade show" role="alert">
-           <strong>{{ session()->get('delete') }}</strong>
-           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-           </button>
-       </div>
-   @endif
-   <!-- End Section deleted Successfully message-->
+    @if (session()->has('delete'))
+        <script>
+            window.onload = function() {
+                notif({
+                    msg: "تم حذف الفاتورة بنجاح",
+                    type: "success"
+                })
+            }
+        </script>
+    @endif
+    <!-- End validation error messages -->
+    <!-- Section Added Successfully message -->
+    @if (session()->has('add'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ session()->get('add') }}</strong>
+            <button type="button" class="close  fixed-top-right" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    <!-- End Section Added Successfully message-->
+    <!-- Section updated Successfully message -->
+    @if (session()->has('update'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ session()->get('update') }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    <!-- End Section Updated Successfully message-->
+    <!-- Section delete Successfully message -->
+    @if (session()->has('delete'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ session()->get('delete') }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+    <!-- End Section deleted Successfully message-->
     <!-- row -->
     <div class="row">
         <div class="col-xl-12">
@@ -95,7 +105,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $product->product_name }}</td>
-                                            <td>{{ $product->section->section_name}}</td>
+                                            <td>{{ $product->section->section_name }}</td>
                                             <td>{{ $product->description }}</td>
                                             <td>
 
@@ -143,16 +153,15 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">اسم المنتج</label>
-                                <input type="text" class="form-control" id="product_name" name="product_name"
-                                    required>
+                                <input type="text" class="form-control" id="product_name" name="product_name" required>
                             </div>
                             <label class="my-1 mr-2" for="inlineFormCustomSelectPref">القسم</label>
-                                        <select name="section_id" id="section_id" class="form-control" required>
-                                            <option value="" selected disabled> --حدد القسم--</option>
-                                            @foreach ($sections as $section)
-                                                <option value="{{ $section->id }}">{{ $section->section_name }}</option>
-                                            @endforeach
-                                        </select>
+                            <select name="section_id" id="section_id" class="form-control" required>
+                                <option value="" selected disabled> --حدد القسم--</option>
+                                @foreach ($sections as $section)
+                                    <option value="{{ $section->id }}">{{ $section->section_name }}</option>
+                                @endforeach
+                            </select>
                             <div class="form-group">
                                 <label for="exampleFormControlTextarea1">ملاحظات</label>
                                 <textarea class="form-control" id="description" name="description" rows="3"></textarea>
@@ -189,9 +198,10 @@
                                 <input class="form-control" name="product_name" id="product_name" type="text">
                             </div>
                             <label class="my-1 mr-2" for="inlineFormCustomSelectPref">القسم</label>
-                            <select name="section_id" id="section_id" class="custom-select my-1 mr-sm-2" value="" required>
+                            <select name="section_id" id="section_id" class="custom-select my-1 mr-sm-2" value=""
+                                required>
                                 @foreach ($sections as $section)
-                                    <option value="{{$section->id}}" >{{ $section->section_name }}</option>
+                                    <option value="{{ $section->id }}">{{ $section->section_name }}</option>
                                 @endforeach
                             </select>
                             <div class="form-group">
@@ -276,7 +286,7 @@
             modal.find('.modal-body #product_name').val(product_name);
             modal.find('.modal-body #section_id').val(section_id);
             modal.find('.modal-body #description').val(description);
-            })
+        })
     </script>
     <!-- End Edit Modal JQuery-->
     <!-- Delete Modal jQuery-->
@@ -294,7 +304,7 @@
     <!-- make any alert dispear after 9 sec  -->
     <script>
         window.setTimeout(() => {
-            $('.alert').fadeTo(500,0).slideUp(function(){
+            $('.alert').fadeTo(500, 0).slideUp(function() {
                 $(this).remove();
             });
         }, 9000);

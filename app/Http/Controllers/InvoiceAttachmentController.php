@@ -69,7 +69,7 @@ class InvoiceAttachmentController extends Controller
      */
     public function destroy(Request $request)
     {
-        InvoiceAttachment::findOrFail($request->file_id)->delete();
+        //delete the Attachments from the storage
         $file_path  = public_path('Attachments'.'/'.$request->invoice_number . '/' . $request->file_name);
         if (File::exists($file_path)) {
             File::delete($file_path );
@@ -77,6 +77,8 @@ class InvoiceAttachmentController extends Controller
         else {
             return redirect()->back()->with(['error' => 'المرفق غير موجود']);
         }
+        //delete the Attachments from the database
+        InvoiceAttachment::findOrFail($request->file_id)->delete();
         return redirect()->back()->with(['delete' => 'تم حذف المرفق بنجاح ']);
     }
 }
