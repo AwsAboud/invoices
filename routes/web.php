@@ -27,6 +27,8 @@ Route::get('/', function () {
 //disable registration
 Auth::routes(['register' => false]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/invoices/{invoice}/edit-status', [ InvoiceController::class,'editStatus'])->name('invoice.edit-status');
+Route::post('/invoices/update-status/{invoice}', [ InvoiceController::class,'updateStatus'])->name('invoice.update-status');
 Route::resource('/invoices', InvoiceController::class)->middleware('auth');
 Route::resource('/sections', SectionController::class)->middleware('auth');
 Route::resource('/products', ProductController::class)->middleware('auth');
