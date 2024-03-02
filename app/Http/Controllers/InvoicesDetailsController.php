@@ -47,8 +47,11 @@ class InvoicesDetailsController extends Controller
      */
     public function show($invoice_id)
     {
+        // Retrieve the invoice, including soft-deleted ones,
+        // to allow viewing details from the invoices.archive view also .
+        $invoice = Invoice::withTrashed()->where('id', $invoice_id)->first();
         return view('invoices.show', [
-            'invoice' => Invoice::where('id', $invoice_id)->first(),
+            'invoice' => $invoice,
             'invoice_details' => InvoicesDetails::where('invoice_id', $invoice_id)->get(),
             'attachments' => InvoiceAttachment::where('invoice_id', $invoice_id)->get()
 

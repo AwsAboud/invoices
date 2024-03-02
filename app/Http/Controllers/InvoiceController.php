@@ -21,8 +21,13 @@ class InvoiceController extends Controller
      */
     public function index()
     {
+        // Enhance performance by selecting only necessary fields from the eager-loaded relation.
+        $invoices = Invoice::with(['section' => function ($query) {
+            $query->select('id', 'section_name');
+        }])->get();
+
         return view('invoices.index', [
-            'invoices' => Invoice::with('section')->get()
+            'invoices' => $invoices
         ]);
     }
 
@@ -84,14 +89,6 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Invoice $invoice)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Invoice $invoice)
@@ -149,7 +146,6 @@ class InvoiceController extends Controller
         $this->createInvoiceDetail($request);
         session()->flash('status_update');
         return redirect('/invoices');
-
     }
 
     /**
@@ -158,22 +154,16 @@ class InvoiceController extends Controller
     public function destroy(Request $request)
     {
         //delete the Attachments from the storage
-        $directory_path = public_path('Attachments'.'/'.$request->invoice_number);
+        $directory_path = public_path('Attachments' . '/' . $request->invoice_number);
         if (File::exists($directory_path)) {
             File::deleteDirectory($directory_path);
         }
-        else {
-            return redirect()->back()->with(['error' => 'المرفق غير موجود']);
-        }
-
         Invoice::findOrFail($request->invoice_id)->forceDelete();
         session()->flash('delete');
         return redirect()->back();
     }
 
-    /**
-     * get product that associated with the given section_id to use it in invoices/create view .
-     */
+    // Get the product that associated with the given section_id to use it in invoices/create view .
     public function getProducts($id)
     {
         $products = Product::where('section_id', $id)->pluck('product_name', 'id');
@@ -199,9 +189,31 @@ class InvoiceController extends Controller
             "created_by" => auth()->user()->name
         ]);
     }
-    //Determine the value_status based on the status passed
+    // Determine the value_status based on the status passed
     private function determineValueStatus($status)
     {
         return $status == Invoice::STATUS_PAID ? Invoice::STATUS_PAID_VALUE : Invoice::STATUS_PARTIAL_PAID_VALUE;
+    }
+
+    // Display a listing of the paid Invoices.
+    public function paidInvoices()
+    {
+        return view('invoices.paid_invoices', [
+            'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_PAID_VALUE)->get()
+        ]);
+    }
+    // Display a listing of the partially paid inoices.
+    public function partialPaidInvoices()
+    {
+        return view('invoices.partial_paid_invoices', [
+            'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_PARTIAL_PAID_VALUE)->get()
+        ]);
+    }
+    // Display a listing of the not paid invoices.
+    public function notPaidInvoices()
+    {
+        return view('invoices.not_paid_invoices', [
+            'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_NOT_PAID_VALUE)->get()
+        ]);
     }
 }
