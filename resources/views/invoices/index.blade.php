@@ -62,14 +62,15 @@
         <!--div-->
         <div class="col-xl-12">
             <div class="card">
-                <!-- add invoice button -->
-                <div class="row row-sm mt-3 mr-2 ">
-                    <div class="col-sm-6 col-md-4 col-xl-3 ">
-                        <a class="modal-effect btn btn-outline-primary btn-block text-lg"
-                            href="{{ route('invoices.create') }}">اضافة&nbsp; فاتورة </a>
-                    </div>
+                <div class="card-header pb-0">
+                        <a href="{{ route('invoices.create') }}" class="modal-effect btn btn-sm btn-primary" style="color:white"><i
+                                class="fas fa-plus"></i>&nbsp; اضافة فاتورة</a>
+
+                        <a class="modal-effect btn btn-sm btn-primary"    href="{{ url('invoices/export') }}"
+                            style="color:white"><i class="fas fa-file-download"></i>&nbsp;تصدير اكسيل</a>
+
                 </div>
-                <!-- End add invoice button -->
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table text-md-nowrap" id="example1">
@@ -139,6 +140,11 @@
                                                         data-target="#Transfer_invoice"><i
                                                             class="text-warning fas fa-exchange-alt"></i>&nbsp;&nbsp;نقل الي
                                                         الارشيف</a>
+                                                    <a class="dropdown-item"
+                                                        href={{ url('invoices/' . $invoice->id . '/print') }}><i
+                                                            class="text-success fas fa-print"></i>&nbsp;&nbsp;طباعة
+                                                        الفاتورة
+                                                    </a>
 
                                                 </div>
                                             </div>

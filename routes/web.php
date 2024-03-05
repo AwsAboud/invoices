@@ -40,6 +40,8 @@ Route::get('/invoices/not-paid', [ InvoiceController::class,'notPaidInvoices']);
 Route::get('/invoices/partial-paid', [ InvoiceController::class,'partialPaidInvoices']);
 Route::get('/invoices/{invoice}/edit-status', [ InvoiceController::class,'editStatus'])->name('invoice.edit-status');
 Route::post('/invoices/update-status/{invoice}', [ InvoiceController::class,'updateStatus'])->name('invoice.update-status');
+Route::get('/invoices/{invoice}/print', [ InvoiceController::class,'print']);
+Route::get('invoices/export/', [InvoiceController::class, 'export']);
 Route::resource('/invoices', InvoiceController::class)->middleware('auth');
 
 Route::resource('/products', ProductController::class)->middleware('auth');

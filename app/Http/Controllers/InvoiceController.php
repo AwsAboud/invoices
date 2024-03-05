@@ -6,13 +6,15 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Section;
 use Illuminate\Http\Request;
+use App\Exports\InvoicesExport;
+use App\Models\InvoicesDetails;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Controllers\InvoicesDetailsController;
 use App\Http\Controllers\InvoiceAttachmentController;
-use App\Models\InvoicesDetails;
-use Illuminate\Support\Facades\File;
 
 class InvoiceController extends Controller
 {
@@ -189,6 +191,7 @@ class InvoiceController extends Controller
             "created_by" => auth()->user()->name
         ]);
     }
+
     // Determine the value_status based on the status passed
     private function determineValueStatus($status)
     {
@@ -202,6 +205,7 @@ class InvoiceController extends Controller
             'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_PAID_VALUE)->get()
         ]);
     }
+
     // Display a listing of the partially paid inoices.
     public function partialPaidInvoices()
     {
@@ -209,6 +213,7 @@ class InvoiceController extends Controller
             'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_PARTIAL_PAID_VALUE)->get()
         ]);
     }
+
     // Display a listing of the not paid invoices.
     public function notPaidInvoices()
     {
@@ -216,4 +221,17 @@ class InvoiceController extends Controller
             'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_NOT_PAID_VALUE)->get()
         ]);
     }
+
+    public function print(Invoice $invoice)
+    {
+        return view('invoices.print', [
+            'invoice' => $invoice
+        ]);
+    }
+
+    public function export()
+    {
+        return Excel::download(new InvoicesExport, 'invoices.xlsx');
+    }
+
 }
