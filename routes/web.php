@@ -2,13 +2,15 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\InvoiceArchiveController;
-use App\Http\Controllers\InvoiceAttachmentController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\InvoicesDetailsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\InvoiceArchiveController;
+use App\Http\Controllers\InvoicesDetailsController;
+use App\Http\Controllers\InvoiceAttachmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,8 +57,12 @@ Route::get('/dawnload-invoice-file/{invoice_number}/{file_name}',[InvoicesDetail
 
 Route::post('/invoice/details/attachment/delete-file',[InvoiceAttachmentController::class, 'destroy'])->name('file.destroy');
 
-
+Route::middleware('auth')->group(function () {
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
+});
 
 //this should be the last route if you but any route after it, it will not work
 Route::get('/{page}', [AdminController::class,'index']);
 
+//require __DIR__.'/auth.php';
