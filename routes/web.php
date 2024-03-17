@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\InvoiceReportController;
+use App\Http\Controllers\CustomerReportController;
 use App\Http\Controllers\InvoiceArchiveController;
 use App\Http\Controllers\InvoicesDetailsController;
 use App\Http\Controllers\InvoiceAttachmentController;
@@ -37,6 +39,13 @@ Route::patch('/invoices/archive/restore/{invoice}',[InvoiceArchiveController::cl
     ->withTrashed();
 Route::get('/invoices/archive',[InvoiceArchiveController::class, 'index'])->name('invoices-archive-list');
 
+Route::get('reports/invoices', [InvoiceReportController::class, 'index']);
+Route::post('reports/invoices/search', [InvoiceReportController::class, 'searchForInvoices']);
+
+Route::get('reports/customers', [CustomerReportController::class, 'index']);
+Route::post('reports/customers/search', [CustomerReportController::class, 'SearchForCustomers']);
+
+
 Route::get('/invoices/paid', [ InvoiceController::class,'paidInvoices']);
 Route::get('/invoices/not-paid', [ InvoiceController::class,'notPaidInvoices']);
 Route::get('/invoices/partial-paid', [ InvoiceController::class,'partialPaidInvoices']);
@@ -56,6 +65,7 @@ Route::get('/view-invoice-file/{invoice_number}/{file_name}',[InvoicesDetailsCon
 Route::get('/dawnload-invoice-file/{invoice_number}/{file_name}',[InvoicesDetailsController::class, 'dawnload_file']);
 
 Route::post('/invoice/details/attachment/delete-file',[InvoiceAttachmentController::class, 'destroy'])->name('file.destroy');
+
 
 Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class);
