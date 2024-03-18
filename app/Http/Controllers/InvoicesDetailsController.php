@@ -9,22 +9,6 @@ use App\Models\InvoiceAttachment;
 class InvoicesDetailsController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store($request, $invoice_id)
@@ -59,21 +43,6 @@ class InvoicesDetailsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(invoicesDetails $invoicesDetails)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, invoicesDetails $invoicesDetails)
-    {
-        //
-    }
-    /**
      *  Display the attachment file from storage
      */
     public function open_file($invoice_number, $file_name){
@@ -88,13 +57,6 @@ class InvoicesDetailsController extends Controller
         //Get the full path to the attachment file
         $file_path  = public_path('Attachments'.'/'.$invoice_number.'/'.$file_name);
         return response()->download($file_path);
-    }
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Request $request)
-    {
-     //
     }
 
 }

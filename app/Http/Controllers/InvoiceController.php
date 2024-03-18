@@ -8,13 +8,12 @@ use App\Models\Section;
 use Illuminate\Http\Request;
 use App\Exports\InvoicesExport;
 use App\Models\InvoicesDetails;
+use App\Models\InvoiceAttachment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreInvoiceRequest;
-use App\Http\Controllers\InvoicesDetailsController;
-use App\Http\Controllers\InvoiceAttachmentController;
 
 class InvoiceController extends Controller
 {
@@ -54,7 +53,7 @@ class InvoiceController extends Controller
         // Begin a database transaction
         DB::beginTransaction();
         try {
-            Invoice::create([
+            $invoice = Invoice::create([
                 'invoice_number' => $request->invoice_number,
                 'invoice_date' => $request->invoice_date,
                 'due_date' => $request->due_date,
@@ -70,13 +69,10 @@ class InvoiceController extends Controller
                 'value_status' => Invoice::STATUS_NOT_PAID_VALUE,
                 'note' => $request->note
             ]);
-            //Retrieve the ID of the most recently added invoice
-            $invoice_id = Invoice::latest('id')->value('id');
-            $invoicesDetails = new InvoicesDetailsController();
-            $invoicesDetails->store($request, $invoice_id);
+
+            $this->storeInvoiceDetails($request, $invoice->id);
             if ($request->hasFile('pic')) {
-                $invoiceAttachment = new InvoiceAttachmentController();
-                $invoiceAttachment->store($request, $invoice_id);
+                $this->storeInvoiceAttachments($request, $invoice->id);
             }
             // Commit the transaction if everything is successful
             DB::commit();
@@ -234,4 +230,29 @@ class InvoiceController extends Controller
         return Excel::download(new InvoicesExport, 'invoices.xlsx');
     }
 
+    private function storeInvoiceDetails($request, $invoice_id){
+        InvoicesDetails::create([
+            'invoice_id' =>  $invoice_id,
+            'product' => $request->product,
+            'section' =>  $request->Section,
+            'invoice_number' => $request->invoice_number,
+            'status' => Invoice::STATUS_NOT_PAID,
+            'value_status' => Invoice::STATUS_NOT_PAID_VALUE,
+            'note' => $request->note,
+            'created_by' => auth()->user()->name,
+
+        ]);
+    }
+    private function storeInvoiceAttachments($request, $invoice_id){
+        $file_name =  $request->file('pic')->getClientOriginalName();
+        InvoiceAttachment::create([
+            'file_name' =>  $file_name,
+            'invoice_number' => $request->invoice_number,
+            'created_by' => auth()->user()->name,
+            'invoice_id' => $invoice_id
+        ]);
+        // Store the attached file in the public/Attachments directory, organizing files by invoice number:
+        // The 'Attachments' directory contains subdirectories named after the actual invoice number.
+        $request->pic->move(public_path('Attachments/' . $request->invoice_number), $file_name);
+    }
 }
