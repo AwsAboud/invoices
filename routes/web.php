@@ -81,7 +81,6 @@ Route::middleware('auth')->group(function () {
 
     //==============================Users====================================================
     Route::resource('users', UserController::class);
-
 });
 
  //this should be the last route if you but any route after it, it will not work

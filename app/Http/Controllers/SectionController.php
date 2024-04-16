@@ -9,9 +9,15 @@ use App\Http\Requests\UpdateSectionRequest;
 
 class SectionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    function __construct()
+    {
+        $this->middleware('permission:عرض-قسم', ['only' => ['index']]);
+        $this->middleware('permission:اضافة-قسم', ['only' => ['store']]);
+        $this->middleware('permission:تعديل-قسم', ['only' => ['update']]);
+        $this->middleware('permission:حذف-قسم', ['only' => ['destroy']]);
+    }
+
     public function index()
     {
         return view('sections.index',[
