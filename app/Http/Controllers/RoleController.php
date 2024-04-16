@@ -13,10 +13,10 @@ class RoleController extends Controller
 
     function __construct()
     {
-        $this->middleware('permission:عرض صلاحية', ['only' => ['index']]);
-        $this->middleware('permission:اضافة صلاحية', ['only' => ['create','store']]);
-        $this->middleware('permission:تعديل صلاحية', ['only' => ['edit','update']]);
-        $this->middleware('permission:حذف صلاحية', ['only' => ['destroy']]);
+        $this->middleware('permission:عرض-صلاحية', ['only' => ['index']]);
+        $this->middleware('permission:اضافة-صلاحية', ['only' => ['create','store']]);
+        $this->middleware('permission:تعديل-صلاحية', ['only' => ['edit','update']]);
+        $this->middleware('permission:حذف-صلاحية', ['only' => ['destroy']]);
     }
 
     public function index()
@@ -60,7 +60,7 @@ class RoleController extends Controller
     public function update(Role $role, Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required',
+            'name' => ['required','unique:roles,name,'. $role->id],
             'permission' => 'required',
         ]);
 

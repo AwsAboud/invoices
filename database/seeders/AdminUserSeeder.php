@@ -21,7 +21,7 @@ class AdminUserSeeder extends Seeder
             'password' => bcrypt('12345678'),
             'status' => 'مفعل'
         ]);
-        $role = Role::create(['name' => 'super admin']);
+        $role = Role::create(['name' => 'super-admin']);
         $permissions = Permission::pluck('id');
         $role->syncPermissions($permissions);
         $user->assignRole([$role->id]);

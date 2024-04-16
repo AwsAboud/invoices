@@ -13,6 +13,15 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
+    function __construct()
+    {
+        $this->middleware('permission:قائمة المستخدمين', ['only' => ['index']]);
+        $this->middleware('permission اضافة منتج', ['only' => ['create','store']]);
+        $this->middleware('permission:تعديل منتج', ['only' => ['edit','update']]);
+        $this->middleware('permission:حذف منتج', ['only' => ['destroy']]);
+    }
+
+
     public function index()
     {
         return view('products.index',[

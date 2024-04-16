@@ -44,7 +44,7 @@
                                 <ul>
                                     @if(!empty($rolePermissionsNames))
                                     @foreach($rolePermissionsNames as $permissionName)
-                                    <li>{{ $permissionName }}</li>
+                                    <li>{{str_replace('-', ' ', $permissionName)}}</li>
                                     @endforeach
                                     @endif
                                 </ul>

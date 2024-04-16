@@ -17,9 +17,17 @@ use App\Http\Requests\StoreInvoiceRequest;
 
 class InvoiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    function __construct()
+    {
+        $this->middleware('permission:', ['only' => ['index']]);
+        $this->middleware('permission:اضافة-فاتورة', ['only' => ['create','store']]);
+        $this->middleware('permission:تعديل-فاتورة', ['only' => ['edit','update']]);
+        $this->middleware('permission:حذف-فاتورة', ['only' => ['destroy']]);
+        $this->middleware('permission:تصدير-Excel', ['only' => ['export']]);
+        $this->middleware('permission:طباعة-فاتور', ['only' => ['print']]);
+        $this->middleware('permission:تغير-حالة-الدفع', ['only' => ['updateStatus']]);
+    }
+
     public function index()
     {
         // Enhance performance by selecting only necessary fields from the eager-loaded relation.
