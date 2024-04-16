@@ -83,5 +83,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
 });
 
-//this should be the last route if you but any route after it, it will not work
-Route::get('/{page}', [AdminController::class, 'index']);
+ //this should be the last route if you but any route after it, it will not work
+ Route::get('/{page}', [AdminController::class, 'index']);
