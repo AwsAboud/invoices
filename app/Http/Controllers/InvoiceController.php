@@ -14,17 +14,20 @@ use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\StoreInvoiceRequest;
+use App\Services\InvoiceService;
 
 class InvoiceController extends Controller
 {
-    function __construct()
+    public InvoiceService $invoiceService;
+    function __construct(InvoiceService $invoiceService)
     {
-        $this->middleware('permission:', ['only' => ['index']]);
+        $this->invoiceService = $invoiceService;
+        $this->middleware('permission:عرض-الفواتير', ['only' => ['index']]);
         $this->middleware('permission:اضافة-فاتورة', ['only' => ['create','store']]);
         $this->middleware('permission:تعديل-فاتورة', ['only' => ['edit','update']]);
         $this->middleware('permission:حذف-فاتورة', ['only' => ['destroy']]);
         $this->middleware('permission:تصدير-Excel', ['only' => ['export']]);
-        $this->middleware('permission:طباعة-فاتور', ['only' => ['print']]);
+        $this->middleware('permission:طباعة-فاتورة', ['only' => ['print']]);
         $this->middleware('permission:تغير-حالة-الدفع', ['only' => ['updateStatus']]);
     }
 
@@ -56,44 +59,14 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
-        //Refactor this function by using a service or repository class to handle the creation of InvoicesDetails & InvoiceAttachments
-
-        // Begin a database transaction
-        DB::beginTransaction();
-        try {
-            $invoice = Invoice::create([
-                'invoice_number' => $request->invoice_number,
-                'invoice_date' => $request->invoice_date,
-                'due_date' => $request->due_date,
-                'section_id' =>  $request->Section,
-                'product' => $request->product,
-                'collection_amount' =>  $request->collection_amount,
-                'commission_amount' => $request->commission_amount,
-                'discount' => $request->discount,
-                'value_vat' => $request->value_vat,
-                'rate_vat' => $request->rate_vat,
-                'total' => $request->Total,
-                'status' => Invoice::STATUS_NOT_PAID,
-                'value_status' => Invoice::STATUS_NOT_PAID_VALUE,
-                'note' => $request->note
-            ]);
-
-            $this->storeInvoiceDetails($request, $invoice->id);
-            if ($request->hasFile('pic')) {
-                $this->storeInvoiceAttachments($request, $invoice->id);
-            }
-            // Commit the transaction if everything is successful
-            DB::commit();
-            // Redirect with success message
+       try{
+            $this->invoiceService->store($request->validated());
             return redirect()->back()->with(['add' => 'تم اضافة الفاتورة بنجاح ']);
-        } catch (QueryException $e) {
-            // An exception occurred, rollback the transaction
-            DB::rollBack();
-            // Redirect with an error message
-            return redirect()->back()->with(['error' => 'حدث خطأ أثناء إضافة الفاتورة']);
-        }
-    }
+        }catch(\Exception $e){
+            return redirect()->back()->with(['error' => 'حدث خطأ أثناء إضافة الفاتورة' . $e->getMessage()]);
+         }
 
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -130,7 +103,7 @@ class InvoiceController extends Controller
             'commission_amount' => $request->commission_amount,
             'discount' => $request->discount,
             'value_vat' => $request->value_vat,
-            'Rate_VAT' => $request->Rate_VAT,
+            'rate_vat' => $request->Rate_VAT,
             'Total' => $request->Total,
             'note' => $request->note,
         ]);
@@ -141,15 +114,7 @@ class InvoiceController extends Controller
      */
     public function updateStatus(Request $request, Invoice $invoice)
     {
-        // Determine the value_status based on thestatus provided in the request
-        $value_status = $this->determineValueStatus($request->status);
-        $invoice->update([
-            'status' => $request->status,
-            'value_status' =>  $value_status,
-            'payment_date' => $request->payment_date
-        ]);
-        // Call the method to create a new row in invoice_details
-        $this->createInvoiceDetail($request);
+        $this->invoiceService->updateInvoiceStatus($request, $invoice);
         session()->flash('status_update');
         return redirect('/invoices');
     }
@@ -175,54 +140,32 @@ class InvoiceController extends Controller
         $products = Product::where('section_id', $id)->pluck('product_name', 'id');
         return json_encode($products);
     }
-    /*
-     * This method should be called after updateStatus method to insert the updated invoice into
-        the invoice details table.
-    */
-    private function createInvoiceDetail($request)
-    {
-        $value_status = $this->determineValueStatus($request->status);
-        InvoicesDetails::create([
-            "invoice_id" => $request->invoice_id,
-            "invoice_number" => $request->invoice_number,
-            "invoice_date" => $request->invoice_date,
-            "section" => $request->section,
-            "product" => $request->product,
-            "status" => $request->status,
-            "value_status" =>  $value_status,
-            "note" => $request->note,
-            "payment_date" => $request->payment_date,
-            "created_by" => auth()->user()->name
-        ]);
-    }
 
-    // Determine the value_status based on the status passed
-    private function determineValueStatus($status)
-    {
-        return $status == Invoice::STATUS_PAID ? Invoice::STATUS_PAID_VALUE : Invoice::STATUS_PARTIAL_PAID_VALUE;
-    }
 
     // Display a listing of the paid Invoices.
     public function paidInvoices()
     {
+        $invoices = Invoice::with('section')->where('value_status', Invoice::STATUS_PAID_VALUE)->get();
         return view('invoices.paid_invoices', [
-            'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_PAID_VALUE)->get()
+            'invoices' => $invoices
         ]);
     }
 
     // Display a listing of the partially paid inoices.
     public function partialPaidInvoices()
     {
+        $invoices = Invoice::with('section')->where('value_status', Invoice::STATUS_PARTIAL_PAID_VALUE)->get();
         return view('invoices.partial_paid_invoices', [
-            'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_PARTIAL_PAID_VALUE)->get()
+            'invoices' => $invoices
         ]);
     }
 
     // Display a listing of the not paid invoices.
     public function notPaidInvoices()
     {
+        $invoices = Invoice::with('section')->where('value_status', Invoice::STATUS_NOT_PAID_VALUE)->get();
         return view('invoices.not_paid_invoices', [
-            'invoices' => Invoice::with('section')->where('value_status', Invoice::STATUS_NOT_PAID_VALUE)->get()
+            'invoices' => $invoices
         ]);
     }
 
@@ -236,31 +179,5 @@ class InvoiceController extends Controller
     public function export()
     {
         return Excel::download(new InvoicesExport, 'invoices.xlsx');
-    }
-
-    private function storeInvoiceDetails($request, $invoice_id){
-        InvoicesDetails::create([
-            'invoice_id' =>  $invoice_id,
-            'product' => $request->product,
-            'section' =>  $request->Section,
-            'invoice_number' => $request->invoice_number,
-            'status' => Invoice::STATUS_NOT_PAID,
-            'value_status' => Invoice::STATUS_NOT_PAID_VALUE,
-            'note' => $request->note,
-            'created_by' => auth()->user()->name,
-
-        ]);
-    }
-    private function storeInvoiceAttachments($request, $invoice_id){
-        $file_name =  $request->file('pic')->getClientOriginalName();
-        InvoiceAttachment::create([
-            'file_name' =>  $file_name,
-            'invoice_number' => $request->invoice_number,
-            'created_by' => auth()->user()->name,
-            'invoice_id' => $invoice_id
-        ]);
-        // Store the attached file in the public/Attachments directory, organizing files by invoice number:
-        // The 'Attachments' directory contains subdirectories named after the actual invoice number.
-        $request->pic->move(public_path('Attachments/' . $request->invoice_number), $file_name);
     }
 }

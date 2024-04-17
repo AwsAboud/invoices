@@ -238,7 +238,7 @@
                 var SectionId = $(this).val();
                 if (SectionId) {
                     $.ajax({
-                        url: "{{ URL::to('section') }}/" + SectionId,
+                        url: "{{ URL::to('/invoice/section') }}/" + SectionId,
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
