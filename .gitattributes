@@ -1,6 +1,9 @@
 * text=auto eol=lf
 
-*.php linguist-detectable=true
+*.css linguist-detectable=false  
+*.js linguist-detectable=false  
+*.scss linguist-detectable=false  
+*.php linguist-detectable=true  
 *.blade.php linguist-detectable=true
 
 /.github export-ignore
